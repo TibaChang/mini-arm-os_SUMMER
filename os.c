@@ -95,7 +95,11 @@ int check_commands(const char *commands,uint32_t index)
 
 void receive_str()
 {
-	//const char const *input_str = "Your input:   ";
+	char * history_1 = (char *)malloc(255 * sizeof(char));
+	int history_count = 1;
+	int history_index = 0;
+	int up_count = 0;
+
 	char str_buffer[INPUT_STR_MAX];
 	int index = 0;
 	print_str("\nPlease input something or \"help\"\n");
@@ -103,6 +107,7 @@ void receive_str()
 	while(1) {
 		if(*(USART2_SR) & USART_FLAG_RXNE) {
 			str_buffer[index] =( *(USART2_DR) & 0x1FF);
+
 			if((int)str_buffer[index]==0xD){//'\r' is 0xD in ascii
 				print_str("\n");
 
@@ -112,16 +117,40 @@ void receive_str()
 						print_char(&str_buffer[j]);
 					}
 				}
+				/*
+				Record input history
+				*/
+				switch(history_count){
+					case 1:
+						strncpy(history_1,str_buffer,index);
+						history_index = index;
+						break;
+				}
+				history_count = 0;
+				history_count++;
+
 				print_str("\n");
 				index = 0;
 				print_str("\nmini-shell:$");
-			}
-			else{
+			}else if(!strncmp(str_buffer,"A",1)){
+				up_count++;
+				switch(up_count){
+					case 1:
+						index = history_index;
+						strncpy(str_buffer,history_1,history_index);
+						for(int j=0;j<index;j++){
+							print_char(&str_buffer[j]);
+						}
+						break;
+				}
+				up_count = 0;
+			}else{
 				print_char(&str_buffer[index]);
 				index++;
 			}
 		}
 	}
+	free(history_1);
 }
 
 static void busy_loop(void *str)

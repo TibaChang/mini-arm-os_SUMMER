@@ -15,6 +15,13 @@ int strncmp(const char *target,const char*source,uint32_t count)
 	return 0;
 }
 
+void strncpy(char *dst, const char*src, size_t n)
+{
+
+while (n-- && (*dst++ = *src++));
+
+}
+
 size_t strlen(const char *str){
 	const char *s;
     for (s = str; *s; ++s);
@@ -49,6 +56,14 @@ void itoa(int n,char *s){
 		s[1] = '\0';
 	}
 
+}
+
+int atoi(char *s){ 
+	int sum = 0; 
+	for(int i = 0;s[i] != '\0';i++){
+		sum = sum*10+s[i]-'0'; 
+	} 
+	return sum; 
 }
 
 #endif
