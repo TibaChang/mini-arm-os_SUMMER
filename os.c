@@ -136,6 +136,13 @@ int check_commands(const char *commands,uint32_t index)
 		print_addQueue("TEST3\n",6);
 		print_addQueue("TEST4\n",6);
 		print_addQueue("TEST5\n",6);
+		print_addQueue("TEST6\n",6);
+		print_addQueue("TEST7\n",6);
+		print_addQueue("TEST8\n",6);
+		print_addQueue("TEST9\n",6);
+		print_addQueue("TEST10\n",7);
+		print_addQueue("TEST11\n",7);
+		print_addQueue("TEST12\n",7);
 		return 1;
 	}
 	else{
