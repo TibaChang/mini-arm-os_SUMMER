@@ -109,22 +109,28 @@ int check_commands(const char *commands,uint32_t index)
 		print("Supported commands:\n");
 		print("- help\n");
 		print("- ps\n");
+		print("- test\n");
 		print("- \"up arrow\"\n");
 		release_Semaphore(print_Semaphore);
 		return 1;
 	}
 	else if(!strncmp(commands,"ps",2) && index ==2){
 		while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
-		print("\n===tID===Thread_Name====\n");
+		print("\n====tID====Priority(big is higher)====Thread_Name====\n");
 		for(int j=0;j<MAX_TASKS &&tasks[j].in_use == 1;j++){
 			char * buf = (char *)malloc(2 * sizeof(int));
+			char * buff = (char *)malloc(2 * sizeof(int));
 			itoa(tasks[j].thread_tID,buf);
-			print("    ");
+			print("     ");
 			print(buf);
-			print("      ");
+			print("            ");
+			itoa(tasks[j].priority,buff);
+			print(buff);
+			print("                     ");
 			print(tasks[j].thread_name);
 			print("\n");
 			free(buf);
+			free(buff);
 		}
 		release_Semaphore(print_Semaphore);
 		
