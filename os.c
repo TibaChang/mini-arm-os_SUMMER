@@ -274,13 +274,13 @@ int main(void)
 
 	usart_init();
 
-	if (thread_create(shell,str1, (void *) str1) == -1)
+	if (thread_create(shell,str1, (void *) str1,10) == -1)
 		print_str("Shell creation failed\r\n");
 
-	if (thread_create(test_fib,str2, (void *) str2) == -1)
+	if (thread_create(test_fib,str2, (void *) str2,5) == -1)
 		print_str("Fib_task creation failed\r\n");
 
-	if (thread_create(Print_task,str3, (void *) str3) == -1)
+	if (thread_create(Print_task,str3, (void *) str3,9) == -1)
 		print_str("Print_task creation failed\r\n");
 
 	/* SysTick configuration */

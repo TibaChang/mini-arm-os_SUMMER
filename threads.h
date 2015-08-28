@@ -5,7 +5,7 @@
 #define MAX_TASKS 10
 
 void thread_start();
-int thread_create(void (*run)(void*),char *thread_name, void* userdata);
+int thread_create(void (*run)(void*),char *thread_name, void* userdata,int priority);
 void thread_kill(int thread_id);
 void thread_self_terminal();
 
@@ -16,6 +16,8 @@ typedef struct {
 	uint8_t in_use;
 	char *thread_name;
 	int thread_tID;
+	int priority;
+	int scheduled;
 } tcb_t;
 
 extern tcb_t tasks[MAX_TASKS];
