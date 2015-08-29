@@ -38,24 +38,24 @@ static void delay(volatile int count)
 }
 */
 
-int acquire_Semaphore(xSemaphore *x){
-	if(x->status == xSemaphore_unlock){
-		x->status = xSemaphore_lock;
-		return xSemaphore_success;
-	}else if(x->status == xSemaphore_lock){
-		return xSemaphore_fail;
+int acquire_Mutex(xMutex *x){
+	if(x->status == xMutex_unlock){
+		x->status = xMutex_lock;
+		return xMutex_success;
+	}else if(x->status == xMutex_lock){
+		return xMutex_fail;
 	}
-	return xSemaphore_fail;
+	return xMutex_fail;
 }
 
-void release_Semaphore(xSemaphore *x){
-	x->status = xSemaphore_unlock;
+void release_Mutex(xMutex *x){
+	x->status = xMutex_unlock;
 }
 
-xSemaphore *print_Semaphore=&(xSemaphore){
-	.lock = xSemaphore_lock,
-	.unlock = xSemaphore_unlock,
-	.status = xSemaphore_unlock
+xMutex *print_Mutex=&(xMutex){
+	.lock = xMutex_lock,
+	.unlock = xMutex_unlock,
+	.status = xMutex_unlock
 };
 
 
@@ -69,33 +69,33 @@ void print_char(const char *str)
 
 void print_str(const char *str)
 {
-	while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+	while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 	while (*str) {
 		while (!(*(USART2_SR) & USART_FLAG_TXE));
 		*(USART2_DR) = (*str & 0xFF);
 		str++;
 	}
-	release_Semaphore(print_Semaphore);
+	release_Mutex(print_Mutex);
 }
 
 void print_str_specific(const char *str,int count)
 {
-	while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+	while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 	for (int i = 0; i < count; i++){
 		print_char(str++);
 	}
-	release_Semaphore(print_Semaphore);
+	release_Mutex(print_Mutex);
 }
 
 
 void print_queue(){
 	if(!isEmpty()){
-		while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+		while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 		while(!isEmpty()){
 			print(Front());
 			Dequeue();
 		}
-		release_Semaphore(print_Semaphore);
+		release_Mutex(print_Mutex);
 	}
 }
 
@@ -104,18 +104,18 @@ void print_queue(){
 int check_commands(const char *commands,uint32_t index)
 {
 	if(!strncmp(commands,"help",4) && index ==4){
-		while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+		while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 		print("\nWelcome to mini-shell\n");
 		print("Supported commands:\n");
 		print("- help\n");
 		print("- ps\n");
 		print("- test\n");
 		print("- \"up arrow\"\n");
-		release_Semaphore(print_Semaphore);
+		release_Mutex(print_Mutex);
 		return 1;
 	}
 	else if(!strncmp(commands,"ps",2) && index ==2){
-		while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+		while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 		print("\n====tID====Priority(big is higher)====Thread_Name====\n");
 		for(int j=0;j<MAX_TASKS &&tasks[j].in_use == 1;j++){
 			char * buf = (char *)malloc(2 * sizeof(int));
@@ -132,7 +132,7 @@ int check_commands(const char *commands,uint32_t index)
 			free(buf);
 			free(buff);
 		}
-		release_Semaphore(print_Semaphore);
+		release_Mutex(print_Mutex);
 		
 		return 1;
 	}
@@ -173,7 +173,7 @@ void receive_str()
 
 			if((int)str_buffer[index]==0xD){//'\r' is 0xD in ascii
 				print_char("\n");
-				release_Semaphore(print_Semaphore);
+				release_Mutex(print_Mutex);
 				if(!check_commands(str_buffer,index)){
 					print_str("Your input:");
 					print_str_specific(str_buffer,index);
@@ -206,7 +206,7 @@ void receive_str()
 			}else{
 				if(index == 0 ){
 					print_str("\nmini-shell:$");
-					while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+					while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 				}
 				print_char(&str_buffer[index]);
 				index++;
@@ -250,12 +250,12 @@ void test_fib(void *userdata)
 	{
 		char * buf = (char *)malloc(8* sizeof(int));
 		itoa(fib(i),buf);
-		while(acquire_Semaphore(print_Semaphore) != xSemaphore_success);//busy wait
+		while(acquire_Mutex(print_Mutex) != xMutex_success);//busy wait
 		print("\nfibonacci seq :");
 		print(buf);
 		free(buf);
 		print(" , \n");
-		release_Semaphore(print_Semaphore);
+		release_Mutex(print_Mutex);
 	}
 }
 
